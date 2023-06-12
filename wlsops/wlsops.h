@@ -5,11 +5,15 @@
 #include <linux/netdevice.h>
 #include <net/cfg80211.h>
 #include <net/mac80211.h>
-#include "intrinsic/ieee80211_i.h"
+// #include "intrinsic/ieee80211_i.h"
+// #define CONFIG_LITTLE_ENDIAN
+// #define DCONFIG_IOCTL_CFG80211
+#include <drv_types.h>
 
-extern struct ieee80211_local *wls_local;
+
 extern struct ieee80211_vif *wls_vif;
-extern struct ieee80211_hw *wls_hw;
+
+
 
 struct __attribute__((__packed__)) tx_param
 {
@@ -20,7 +24,7 @@ struct __attribute__((__packed__)) tx_param
     uint8_t aifs;
 };
 
-int wls_hack_init(void);
+int wls_hack_init(char * ifname);
 int wls_conf_tx(struct tx_param);
 
 #endif

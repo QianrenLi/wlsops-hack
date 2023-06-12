@@ -13,6 +13,10 @@
 static struct task_struct *kThread;
 static struct tx_param kParam;
 
+static char *my_parameter = "default";
+module_param(my_parameter, charp, S_IRUGO | S_IWUSR);
+
+
 int read_loop(void *data)
 {
     while(!kthread_should_stop())
@@ -30,7 +34,7 @@ int read_loop(void *data)
 
 static int __init wlsops_init(void)
 {
-    if ( (wls_hack_init()<0) || (hack_mmap_init()<0) )
+    if ( (wls_hack_init(my_parameter)<0) || (hack_mmap_init()<0) )
     {
         printh("HACK_ENTRY failed.\n");
         return -1;
@@ -50,6 +54,7 @@ static void __exit wlsops_fini(void)
     printh("Now exit~\n");
     printh("\n");
 }
+
 
 module_init(wlsops_init);
 module_exit(wlsops_fini);

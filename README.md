@@ -29,6 +29,8 @@ The memory r/w is currently implemented in synchronized block writing/reading (t
 ### How to Use
 > Make sure that you have at least one wireless NIC enabled.
 
-1. Run `sudo insmod build/wlsops/wlsops_hack.ko` to install the built kernel modules, where `wlsops_hack` will use the first wireless NIC found in the system;
+1. To build the hack for realtek 8812au, one might include specfic include requirements to the folder wlsops or compile the module with makefile(.bak) in aircrack-ng/rtl8812au
 
-2. Run the test in `wlsctrl/tests` with root permission.
+2. Run `sudo insmod build/wlsops/wlsops_hack.ko` to install the built kernel modules, where `wlsops_hack` will use the first wireless NIC found in the system;
+
+3. Run the test in `wlsctrl/tests` with root permission.
