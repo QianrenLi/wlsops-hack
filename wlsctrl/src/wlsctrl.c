@@ -7,8 +7,8 @@
 
 static int fd;
 static info_blk *w_blk;
-//<little-endian>:           ac-16,     txop-16,   cw_min-16, cw_max-16, aifs-8
-static char tx_params[9] = { 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00 };
+//<little-endian>:           ac-16,     txop-16,   cw_min-16, cw_max-16, aifs-8 if_ind-8
+static char tx_params[10] = { 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00 , 0x00};
 // const char tx_prior[9]   = {0x00,0x00, 0x00,0x00, 0x01,0x00, 0x01,0x00, 0x00}; //0,0,1,1,1
 // const char tx_normal[9]  = {0x00,0x00, 0x00,0x00, 0x03,0x00, 0x07,0x00, 0x02}; //0,0,3,7,2
 // const char tx_last[9]    = {0x00,0x00, 0x00,0x00, 0xFF,0x03, 0xFF,0x07, 0x0F}; //0,0,1023,2047,15
@@ -30,7 +30,7 @@ static inline int mmap_write(const char *src, size_t len)
 int w_writer(const char *ptr)
 {
     int cnt = 0;
-    while(mmap_write(ptr, 9)==0)
+    while(mmap_write(ptr, 10)==0)
     {
         if(++cnt>MAX_TIMEOUT)
         {
@@ -40,7 +40,7 @@ int w_writer(const char *ptr)
     return 0;
 }
 
-int set_tx_params(uint16_t ac, uint8_t aifs, uint16_t cw_min, uint16_t cw_max)
+int set_tx_params(uint16_t ac, uint8_t aifs, uint16_t cw_min, uint16_t cw_max, uint8_t if_ind)
 {
     tx_params[0] = ac & 0xFF;
     tx_params[8] = aifs;
@@ -51,6 +51,7 @@ int set_tx_params(uint16_t ac, uint8_t aifs, uint16_t cw_min, uint16_t cw_max)
     tx_params[6] = cw_max & 0xFF;
     tx_params[7] = (cw_max>>8) & 0xFF;
 
+    tx_params[9] = if_ind;
     return w_writer(tx_params);
 }
 

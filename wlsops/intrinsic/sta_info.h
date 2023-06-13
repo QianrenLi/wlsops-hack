@@ -6,8 +6,8 @@
  * Copyright(c) 2020-2021 Intel Corporation
  */
 
-#ifndef STA_INFO_H
-#define STA_INFO_H
+#ifndef t_sta_info_H
+#define t_sta_info_H
 
 #include <linux/list.h>
 #include <linux/types.h>
@@ -23,7 +23,7 @@
 /**
  * enum ieee80211_sta_info_flags - Stations flags
  *
- * These flags are used with &struct sta_info's @flags member, but
+ * These flags are used with &struct t_sta_info's @flags member, but
  * only indirectly with set_sta_flag() and friends.
  *
  * @WLAN_STA_AUTH: Station is authenticated.
@@ -150,12 +150,12 @@ struct airtime_info {
 };
 
 void ieee80211_sta_update_pending_airtime(struct ieee80211_local *local,
-					  struct sta_info *sta, u8 ac,
+					  struct t_sta_info *sta, u8 ac,
 					  u16 tx_airtime, bool tx_completed);
 void ieee80211_register_airtime(struct ieee80211_txq *txq,
 				u32 tx_airtime, u32 rx_airtime);
 
-struct sta_info;
+struct t_sta_info;
 
 /**
  * struct tid_ampdu_tx - TID aggregation information (Tx).
@@ -191,7 +191,7 @@ struct tid_ampdu_tx {
 	struct timer_list session_timer;
 	struct timer_list addba_resp_timer;
 	struct sk_buff_head pending;
-	struct sta_info *sta;
+	struct t_sta_info *sta;
 	unsigned long state;
 	unsigned long last_tx;
 	u16 timeout;
@@ -245,7 +245,7 @@ struct tid_ampdu_rx {
 	u64 reorder_buf_filtered;
 	struct sk_buff_head *reorder_buf;
 	unsigned long *reorder_time;
-	struct sta_info *sta;
+	struct t_sta_info *sta;
 	struct timer_list session_timer;
 	struct timer_list reorder_timer;
 	unsigned long last_rx;
@@ -382,7 +382,7 @@ DECLARE_EWMA(mesh_tx_rate_avg, 8, 16)
  * @plink_state: peer link state
  * @plink_timeout: timeout of peer link
  * @plink_timer: peer link watch timer
- * @plink_sta: peer link watch timer's sta_info
+ * @plink_sta: peer link watch timer's t_sta_info
  * @t_offset: timing offset relative to this host
  * @t_offset_setpoint: reference timing offset of this sta to be used when
  * 	calculating clockdrift
@@ -398,7 +398,7 @@ DECLARE_EWMA(mesh_tx_rate_avg, 8, 16)
  */
 struct mesh_sta {
 	struct timer_list plink_timer;
-	struct sta_info *plink_sta;
+	struct t_sta_info *plink_sta;
 
 	s64 t_offset;
 	s64 t_offset_setpoint;
@@ -482,7 +482,7 @@ struct ieee80211_fragment_cache {
 #define STA_SLOW_THRESHOLD 6000 /* 6 Mbps */
 
 /**
- * struct sta_info - STA information
+ * struct t_sta_info - STA information
  *
  * This structure collects information about a station that
  * mac80211 is communicating with.
@@ -567,7 +567,7 @@ struct ieee80211_fragment_cache {
  * @status_stats.avg_ack_signal: average ACK signal
  * @frags: fragment cache
  */
-struct sta_info {
+struct t_sta_info {
 	/* General information, mostly static */
 	struct list_head list, free_list;
 	struct rcu_head rcu_head;
@@ -679,7 +679,7 @@ struct sta_info {
 	struct ieee80211_sta sta;
 };
 
-static inline enum nl80211_plink_state sta_plink_state(struct sta_info *sta)
+static inline enum nl80211_plink_state sta_plink_state(struct t_sta_info *sta)
 {
 #ifdef CONFIG_MAC80211_MESH
 	return sta->mesh->plink_state;
@@ -687,7 +687,7 @@ static inline enum nl80211_plink_state sta_plink_state(struct sta_info *sta)
 	return NL80211_PLINK_LISTEN;
 }
 
-static inline void set_sta_flag(struct sta_info *sta,
+static inline void set_sta_flag(struct t_sta_info *sta,
 				enum ieee80211_sta_info_flags flag)
 {
 	WARN_ON(flag == WLAN_STA_AUTH ||
@@ -696,7 +696,7 @@ static inline void set_sta_flag(struct sta_info *sta,
 	set_bit(flag, &sta->_flags);
 }
 
-static inline void clear_sta_flag(struct sta_info *sta,
+static inline void clear_sta_flag(struct t_sta_info *sta,
 				  enum ieee80211_sta_info_flags flag)
 {
 	WARN_ON(flag == WLAN_STA_AUTH ||
@@ -705,13 +705,13 @@ static inline void clear_sta_flag(struct sta_info *sta,
 	clear_bit(flag, &sta->_flags);
 }
 
-static inline int test_sta_flag(struct sta_info *sta,
+static inline int test_sta_flag(struct t_sta_info *sta,
 				enum ieee80211_sta_info_flags flag)
 {
 	return test_bit(flag, &sta->_flags);
 }
 
-static inline int test_and_clear_sta_flag(struct sta_info *sta,
+static inline int test_and_clear_sta_flag(struct t_sta_info *sta,
 					  enum ieee80211_sta_info_flags flag)
 {
 	WARN_ON(flag == WLAN_STA_AUTH ||
@@ -720,7 +720,7 @@ static inline int test_and_clear_sta_flag(struct sta_info *sta,
 	return test_and_clear_bit(flag, &sta->_flags);
 }
 
-static inline int test_and_set_sta_flag(struct sta_info *sta,
+static inline int test_and_set_sta_flag(struct t_sta_info *sta,
 					enum ieee80211_sta_info_flags flag)
 {
 	WARN_ON(flag == WLAN_STA_AUTH ||
@@ -729,26 +729,26 @@ static inline int test_and_set_sta_flag(struct sta_info *sta,
 	return test_and_set_bit(flag, &sta->_flags);
 }
 
-int sta_info_move_state(struct sta_info *sta,
+int t_sta_info_move_state(struct t_sta_info *sta,
 			enum ieee80211_sta_state new_state);
 
-static inline void sta_info_pre_move_state(struct sta_info *sta,
+static inline void t_sta_info_pre_move_state(struct t_sta_info *sta,
 					   enum ieee80211_sta_state new_state)
 {
 	int ret;
 
 	WARN_ON_ONCE(test_sta_flag(sta, WLAN_STA_INSERTED));
 
-	ret = sta_info_move_state(sta, new_state);
+	ret = t_sta_info_move_state(sta, new_state);
 	WARN_ON_ONCE(ret);
 }
 
 
-void ieee80211_assign_tid_tx(struct sta_info *sta, int tid,
+void ieee80211_assign_tid_tx(struct t_sta_info *sta, int tid,
 			     struct tid_ampdu_tx *tid_tx);
 
 static inline struct tid_ampdu_tx *
-rcu_dereference_protected_tid_tx(struct sta_info *sta, int tid)
+rcu_dereference_protected_tid_tx(struct t_sta_info *sta, int tid)
 {
 	return rcu_dereference_protected(sta->ampdu_mlme.tid_tx[tid],
 					 lockdep_is_held(&sta->lock) ||
@@ -764,7 +764,7 @@ rcu_dereference_protected_tid_tx(struct sta_info *sta, int tid)
 
 /* How often station data is cleaned up (e.g., expiration of buffered frames)
  */
-#define STA_INFO_CLEANUP_INTERVAL (10 * HZ)
+#define t_sta_info_CLEANUP_INTERVAL (10 * HZ)
 
 struct rhlist_head *sta_info_hash_lookup(struct ieee80211_local *local,
 					 const u8 *addr);
@@ -772,33 +772,33 @@ struct rhlist_head *sta_info_hash_lookup(struct ieee80211_local *local,
 /*
  * Get a STA info, must be under RCU read lock.
  */
-struct sta_info *sta_info_get(struct ieee80211_sub_if_data *sdata,
+struct t_sta_info *sta_info_get(struct ieee80211_sub_if_data *sdata,
 			      const u8 *addr);
 
-struct sta_info *sta_info_get_bss(struct ieee80211_sub_if_data *sdata,
+struct t_sta_info *sta_info_get_bss(struct ieee80211_sub_if_data *sdata,
 				  const u8 *addr);
 
 /* user must hold sta_mtx or be in RCU critical section */
-struct sta_info *sta_info_get_by_addrs(struct ieee80211_local *local,
+struct t_sta_info *sta_info_get_by_addrs(struct ieee80211_local *local,
 				       const u8 *sta_addr, const u8 *vif_addr);
 
 #define for_each_sta_info(local, _addr, _sta, _tmp)			\
 	rhl_for_each_entry_rcu(_sta, _tmp,				\
-			       sta_info_hash_lookup(local, _addr), hash_node)
+			       t_sta_info_hash_lookup(local, _addr), hash_node)
 
 /*
  * Get STA info by index, BROKEN!
  */
-struct sta_info *sta_info_get_by_idx(struct ieee80211_sub_if_data *sdata,
+struct t_sta_info *sta_info_get_by_idx(struct ieee80211_sub_if_data *sdata,
 				     int idx);
 /*
  * Create a new STA info, caller owns returned structure
- * until sta_info_insert().
+ * until t_sta_info_insert().
  */
-struct sta_info *sta_info_alloc(struct ieee80211_sub_if_data *sdata,
+struct t_sta_info *sta_info_alloc(struct ieee80211_sub_if_data *sdata,
 				const u8 *addr, gfp_t gfp);
 
-void sta_info_free(struct ieee80211_local *local, struct sta_info *sta);
+void t_sta_info_free(struct ieee80211_local *local, struct t_sta_info *sta);
 
 /*
  * Insert STA info into hash table/list, returns zero or a
@@ -808,19 +808,19 @@ void sta_info_free(struct ieee80211_local *local, struct sta_info *sta);
  * the _rcu version calls read_lock_rcu() and must be called
  * without it held.
  */
-int sta_info_insert(struct sta_info *sta);
-int sta_info_insert_rcu(struct sta_info *sta) __acquires(RCU);
+int t_sta_info_insert(struct t_sta_info *sta);
+int t_sta_info_insert_rcu(struct t_sta_info *sta) __acquires(RCU);
 
-int __must_check __sta_info_destroy(struct sta_info *sta);
-int sta_info_destroy_addr(struct ieee80211_sub_if_data *sdata,
+int __must_check __sta_info_destroy(struct t_sta_info *sta);
+int t_sta_info_destroy_addr(struct ieee80211_sub_if_data *sdata,
 			  const u8 *addr);
-int sta_info_destroy_addr_bss(struct ieee80211_sub_if_data *sdata,
+int t_sta_info_destroy_addr_bss(struct ieee80211_sub_if_data *sdata,
 			      const u8 *addr);
 
-void sta_info_recalc_tim(struct sta_info *sta);
+void t_sta_info_recalc_tim(struct t_sta_info *sta);
 
-int sta_info_init(struct ieee80211_local *local);
-void sta_info_stop(struct ieee80211_local *local);
+int t_sta_info_init(struct ieee80211_local *local);
+void t_sta_info_stop(struct ieee80211_local *local);
 
 /**
  * __sta_info_flush - flush matching STA entries from the STA table
@@ -833,34 +833,34 @@ void sta_info_stop(struct ieee80211_local *local);
 int __sta_info_flush(struct ieee80211_sub_if_data *sdata, bool vlans);
 
 /**
- * sta_info_flush - flush matching STA entries from the STA table
+ * t_sta_info_flush - flush matching STA entries from the STA table
  *
  * Returns the number of removed STA entries.
  *
  * @sdata: sdata to remove all stations from
  */
-static inline int sta_info_flush(struct ieee80211_sub_if_data *sdata)
+static inline int t_sta_info_flush(struct ieee80211_sub_if_data *sdata)
 {
 	return __sta_info_flush(sdata, false);
 }
 
-void sta_set_rate_info_tx(struct sta_info *sta,
+void sta_set_rate_info_tx(struct t_sta_info *sta,
 			  const struct ieee80211_tx_rate *rate,
 			  struct rate_info *rinfo);
-void sta_set_sinfo(struct sta_info *sta, struct station_info *sinfo,
+void sta_set_sinfo(struct t_sta_info *sta, struct station_info *sinfo,
 		   bool tidstats);
 
-u32 sta_get_expected_throughput(struct sta_info *sta);
+u32 sta_get_expected_throughput(struct t_sta_info *sta);
 
 void ieee80211_sta_expire(struct ieee80211_sub_if_data *sdata,
 			  unsigned long exp_time);
-u8 sta_info_tx_streams(struct sta_info *sta);
+u8 t_sta_info_tx_streams(struct t_sta_info *sta);
 
-void ieee80211_sta_ps_deliver_wakeup(struct sta_info *sta);
-void ieee80211_sta_ps_deliver_poll_response(struct sta_info *sta);
-void ieee80211_sta_ps_deliver_uapsd(struct sta_info *sta);
+void ieee80211_sta_ps_deliver_wakeup(struct t_sta_info *sta);
+void ieee80211_sta_ps_deliver_poll_response(struct t_sta_info *sta);
+void ieee80211_sta_ps_deliver_uapsd(struct t_sta_info *sta);
 
-unsigned long ieee80211_sta_last_active(struct sta_info *sta);
+unsigned long ieee80211_sta_last_active(struct t_sta_info *sta);
 
 enum sta_stats_type {
 	STA_STATS_RATE_TYPE_INVALID = 0,
@@ -930,4 +930,4 @@ static inline u32 sta_stats_encode_rate(struct ieee80211_rx_status *s)
 	return r;
 }
 
-#endif /* STA_INFO_H */
+#endif /* t_sta_info_H */

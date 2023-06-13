@@ -11,10 +11,10 @@ def main(args):
         try:
             with MmapContext() as ctx:
                 if args.realtek:
-                    set_tx_params(ctx, [0], 2, 2, 3)
-                    set_tx_params(ctx, [1], 2, 3, 4)
-                    set_tx_params(ctx, [2], 3, 4, 10)
-                    set_tx_params(ctx, [3], 7, 4, 10)
+                    set_tx_params(ctx, [0], 2, 2, 3 , 1)
+                    set_tx_params(ctx, [1], 2, 3, 4 , 1)
+                    set_tx_params(ctx, [2], 3, 4, 10, 1)
+                    set_tx_params(ctx, [3], 7, 4, 10, 1)
                 else:
                     reset_tx_params(ctx)
                 print("reset")
@@ -24,7 +24,7 @@ def main(args):
         try:
             with MmapContext() as ctx:
                 if args.realtek:
-                    set_tx_params(ctx, [args.ac], args.aifs, log2(args.cw_min), log2(args.cw_max))
+                    set_tx_params(ctx, [args.ac], args.aifs, log2(args.cw_min), log2(args.cw_max), 1)
                     print("Set ac%d: cw_min=%d, cw_max=%d, aifs=%d" % (args.ac, log2(args.cw_min), log2(args.cw_max), args.aifs))
                 else:
                     set_tx_params(ctx, [args.ac], args.aifs, args.cw_min, args.cw_max)

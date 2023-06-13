@@ -18,7 +18,6 @@ deps_/home/lqr11812417/workspace/rtl8812au/wlsops/wlsops.o := \
     $(wildcard include/config/ARCH_USE_BUILTIN_BSWAP) \
     $(wildcard include/config/KCOV) \
   /home/lqr11812417/workspace/rtl8812au/wlsops/wlsops.h \
-    $(wildcard include/config/LITTLE_ENDIAN) \
   include/linux/string.h \
     $(wildcard include/config/BINARY_PRINTF) \
     $(wildcard include/config/FORTIFY_SOURCE) \
@@ -1492,6 +1491,33 @@ deps_/home/lqr11812417/workspace/rtl8812au/wlsops/wlsops.o := \
   include/linux/udp.h \
   include/uapi/linux/udp.h \
   include/net/ieee80211_radiotap.h \
+  /home/lqr11812417/workspace/rtl8812au/wlsops/intrinsic/ieee80211_i.h \
+    $(wildcard include/config/MAC80211_DEBUG_COUNTERS) \
+    $(wildcard include/config/MAC80211_NOINLINE) \
+  include/linux/rhashtable.h \
+  include/net/fq.h \
+  /home/lqr11812417/workspace/rtl8812au/wlsops/intrinsic/key.h \
+  include/linux/crypto.h \
+    $(wildcard include/config/CRYPTO_STATS) \
+  include/crypto/arc4.h \
+  /home/lqr11812417/workspace/rtl8812au/wlsops/intrinsic/sta_info.h \
+  include/linux/average.h \
+  include/linux/bitfield.h \
+  /home/lqr11812417/workspace/rtl8812au/wlsops/intrinsic/debug.h \
+    $(wildcard include/config/MAC80211_OCB_DEBUG) \
+    $(wildcard include/config/MAC80211_IBSS_DEBUG) \
+    $(wildcard include/config/MAC80211_PS_DEBUG) \
+    $(wildcard include/config/MAC80211_HT_DEBUG) \
+    $(wildcard include/config/MAC80211_MPL_DEBUG) \
+    $(wildcard include/config/MAC80211_MPATH_DEBUG) \
+    $(wildcard include/config/MAC80211_MHWMP_DEBUG) \
+    $(wildcard include/config/MAC80211_MESH_SYNC_DEBUG) \
+    $(wildcard include/config/MAC80211_MESH_CSA_DEBUG) \
+    $(wildcard include/config/MAC80211_MESH_PS_DEBUG) \
+    $(wildcard include/config/MAC80211_TDLS_DEBUG) \
+    $(wildcard include/config/MAC80211_STA_DEBUG) \
+    $(wildcard include/config/MAC80211_MLME_DEBUG) \
+    $(wildcard include/config/MAC80211_MESSAGE_TRACING) \
   /home/lqr11812417/workspace/rtl8812au/include/drv_types.h \
     $(wildcard include/config/ARP_KEEP_ALIVE) \
     $(wildcard include/config/80211N_HT) \
@@ -1802,6 +1828,7 @@ deps_/home/lqr11812417/workspace/rtl8812au/wlsops/wlsops.o := \
   include/linux/pm_runtime.h \
   /home/lqr11812417/workspace/rtl8812au/include/../os_dep/linux/rtw_rhashtable.h \
   /home/lqr11812417/workspace/rtl8812au/include/rtw_byteorder.h \
+    $(wildcard include/config/LITTLE_ENDIAN) \
     $(wildcard include/config/BIG_ENDIAN) \
     $(wildcard include/config/PLATFORM_MSTAR389) \
   /home/lqr11812417/workspace/rtl8812au/include/byteorder/little_endian.h \

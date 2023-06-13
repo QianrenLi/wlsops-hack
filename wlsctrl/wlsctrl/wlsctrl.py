@@ -27,19 +27,20 @@ class MmapContext:
         pass
     pass
 
-def reset_tx_params(ctx):
-    ctx.set_tx_params(0, TX_PARAMS[0]['aifs'], TX_PARAMS[0]['cw_min'], TX_PARAMS[0]['cw_max'])
-    ctx.set_tx_params(1, TX_PARAMS[1]['aifs'], TX_PARAMS[1]['cw_min'], TX_PARAMS[1]['cw_max'])
-    ctx.set_tx_params(2, TX_PARAMS[2]['aifs'], TX_PARAMS[2]['cw_min'], TX_PARAMS[2]['cw_max'])
-    ctx.set_tx_params(3, TX_PARAMS[3]['aifs'], TX_PARAMS[3]['cw_min'], TX_PARAMS[3]['cw_max'])
+def reset_tx_params(ctx, if_ind = 0):
+    ctx.set_tx_params(0, TX_PARAMS[0]['aifs'], TX_PARAMS[0]['cw_min'], TX_PARAMS[0]['cw_max'],if_ind)
+    ctx.set_tx_params(1, TX_PARAMS[1]['aifs'], TX_PARAMS[1]['cw_min'], TX_PARAMS[1]['cw_max'],if_ind)
+    ctx.set_tx_params(2, TX_PARAMS[2]['aifs'], TX_PARAMS[2]['cw_min'], TX_PARAMS[2]['cw_max'],if_ind)
+    ctx.set_tx_params(3, TX_PARAMS[3]['aifs'], TX_PARAMS[3]['cw_min'], TX_PARAMS[3]['cw_max'],if_ind)
     pass
 
-def set_tx_params(ctx, acq:list, aifs:int, cw_min:int, cw_max:int):
+def set_tx_params(ctx, acq:list, aifs:int, cw_min:int, cw_max:int, if_ind = 0):
+
     for ac in acq:
         aifs   = aifs   if aifs>=0   else TX_PARAMS[ac]['aifs']
         cw_min = cw_min if cw_min>=0 else TX_PARAMS[ac]['cw_min']
         cw_max = cw_max if cw_max>=0 else TX_PARAMS[ac]['cw_max']
-        ret = ctx.set_tx_params(ac, aifs, cw_min, cw_max)
+        ret = ctx.set_tx_params(ac, aifs, cw_min, cw_max, if_ind)
         # print(f'set AC{ac}: {ret}.')
     pass
 

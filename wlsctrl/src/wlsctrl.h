@@ -22,6 +22,6 @@ struct mmap_info
 
 int w_init(void);
 void w_fini(void);
-int set_tx_params(uint16_t ac, uint8_t aifs, uint16_t cw_min, uint16_t cw_max);
+int set_tx_params(uint16_t ac, uint8_t aifs, uint16_t cw_min, uint16_t cw_max, uint8_t if_ind);
 
 #endif
