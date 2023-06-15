@@ -11,7 +11,8 @@ The memory r/w is currently implemented in synchronized block writing/reading (t
 
 ### Build
 - build the kernel module
-    > We use a custom `iwlmvm` build in this repo. You can disable it with `cmake -DBUILD_IWLMVM=OFF ..`
+    > We use a custom `iwlmvm` and `iwldvm` build in this repo. You can disable it with `cmake -DBUILD_IWLMVM=OFF -DBUILD_IWLDVM=TRUE ..` to activate the dvm module or `cmake -DBUILD_IWLMVM=TRUE -DBUILD_IWLDVM=OFF ..` mvm module.
+
     ```bash
     mkdir build
     cd build && cmake ..
@@ -19,7 +20,7 @@ The memory r/w is currently implemented in synchronized block writing/reading (t
     ```
 
 - build and install the python controller package
-    > It is recommended to install the package globally which could be found by root user.
+    > It is recommended to install the package globally which could be found by root user. If `master` module is built before, one may need to recompile the wheel by `sudo pip3 uninstall ./dist/*.whl`.
     ```bash
     cd wlsctrl
     python3 setup.py bdist_wheel
@@ -29,7 +30,7 @@ The memory r/w is currently implemented in synchronized block writing/reading (t
 ### How to Use
 > Make sure that you have at least one wireless NIC enabled.
 
-1. To build the hack for realtek 8812au, one might include specfic include requirements to the folder wlsops or compile the module with makefile(.bak) in aircrack-ng/rtl8812au
+1. To build the hack for realtek 8812au, one might include specfic include requirements to the folder wlsops or compile the module with makefile(.bak) in aircrack-ng/rtl8812au. (or directly use https://github.com/QianrenLi/rtl8812au)
 
 2. Run `sudo insmod build/wlsops/wlsops_hack.ko` to install the built kernel modules, where `wlsops_hack` will use the first wireless NIC found in the system;
 

@@ -155,7 +155,7 @@ struct ieee80211_tx_data {
 	struct sk_buff_head skbs;
 	struct ieee80211_local *local;
 	struct ieee80211_sub_if_data *sdata;
-	struct t_sta_info *sta;
+	struct sta_info *sta;
 	struct ieee80211_key *key;
 	struct ieee80211_tx_rate rate;
 
@@ -204,7 +204,7 @@ struct ieee80211_rx_data {
 	struct sk_buff *skb;
 	struct ieee80211_local *local;
 	struct ieee80211_sub_if_data *sdata;
-	struct t_sta_info *sta;
+	struct sta_info *sta;
 	struct ieee80211_key *key;
 
 	unsigned int flags;
@@ -282,7 +282,7 @@ struct unsol_bcast_probe_resp_data {
 struct ps_data {
 	/* yes, this looks ugly, but guarantees that we can later use
 	 * bitmap_empty :)
-	 * NB: don't touch this bitmap, use t_sta_info_{set,clear}_tim_bit */
+	 * NB: don't touch this bitmap, use sta_info_{set,clear}_tim_bit */
 	u8 tim[sizeof(unsigned long) * BITS_TO_LONGS(IEEE80211_MAX_AID + 1)]
 			__aligned(__alignof__(unsigned long));
 	struct sk_buff_head bc_buf;
@@ -311,7 +311,7 @@ struct ieee80211_if_vlan {
 	struct list_head list; /* write-protected with RTNL and local->mtx */
 
 	/* used for all tx if the VLAN is configured to 4-addr mode */
-	struct t_sta_info __rcu *sta;
+	struct sta_info __rcu *sta;
 	atomic_t num_mcast_sta; /* number of stations receiving multicast */
 };
 
@@ -1320,7 +1320,7 @@ struct ieee80211_local {
 	struct mutex iflist_mtx;
 
 	/*
-	 * Key mutex, protects sdata's key_list and t_sta_info's
+	 * Key mutex, protects sdata's key_list and sta_info's
 	 * key pointers and ptk_idx (write access, they're RCU.)
 	 */
 	struct mutex key_mtx;
@@ -1613,10 +1613,10 @@ static inline bool txq_has_queue(struct ieee80211_txq *txq)
 static inline struct airtime_info *to_airtime_info(struct ieee80211_txq *txq)
 {
 	struct ieee80211_sub_if_data *sdata;
-	struct t_sta_info *sta;
+	struct sta_info *sta;
 
 	if (txq->sta) {
-		sta = container_of(txq->sta, struct t_sta_info, sta);
+		sta = container_of(txq->sta, struct sta_info, sta);
 		return &sta->airtime[txq->ac];
 	}
 
@@ -1776,10 +1776,10 @@ u64 ieee80211_mgmt_tx_cookie(struct ieee80211_local *local);
 int ieee80211_attach_ack_skb(struct ieee80211_local *local, struct sk_buff *skb,
 			     u64 *cookie, gfp_t gfp);
 
-void ieee80211_check_fast_rx(struct t_sta_info *sta);
+void ieee80211_check_fast_rx(struct sta_info *sta);
 void __ieee80211_check_fast_rx_iface(struct ieee80211_sub_if_data *sdata);
 void ieee80211_check_fast_rx_iface(struct ieee80211_sub_if_data *sdata);
-void ieee80211_clear_fast_rx(struct t_sta_info *sta);
+void ieee80211_clear_fast_rx(struct sta_info *sta);
 
 /* STA code */
 void ieee80211_sta_setup_sdata(struct ieee80211_sub_if_data *sdata);
@@ -1964,10 +1964,10 @@ void ieee80211_tx_monitor(struct ieee80211_local *local, struct sk_buff *skb,
 			  int retry_count, int shift, bool send_to_cooked,
 			  struct ieee80211_tx_status *status);
 
-void ieee80211_check_fast_xmit(struct t_sta_info *sta);
+void ieee80211_check_fast_xmit(struct sta_info *sta);
 void ieee80211_check_fast_xmit_all(struct ieee80211_local *local);
 void ieee80211_check_fast_xmit_iface(struct ieee80211_sub_if_data *sdata);
-void ieee80211_clear_fast_xmit(struct t_sta_info *sta);
+void ieee80211_clear_fast_xmit(struct sta_info *sta);
 int ieee80211_tx_control_port(struct wiphy *wiphy, struct net_device *dev,
 			      const u8 *buf, size_t len,
 			      const u8 *dest, __be16 proto, bool unencrypted,
@@ -1989,7 +1989,7 @@ void ieee80211_apply_htcap_overrides(struct ieee80211_sub_if_data *sdata,
 bool ieee80211_ht_cap_ie_to_sta_ht_cap(struct ieee80211_sub_if_data *sdata,
 				       struct ieee80211_supported_band *sband,
 				       const struct ieee80211_ht_cap *ht_cap_ie,
-				       struct t_sta_info *sta);
+				       struct sta_info *sta);
 void ieee80211_send_delba(struct ieee80211_sub_if_data *sdata,
 			  const u8 *da, u16 tid,
 			  u16 initiator, u16 reason_code);
@@ -2001,40 +2001,40 @@ void ieee80211_request_smps_mgd_work(struct work_struct *work);
 bool ieee80211_smps_is_restrictive(enum ieee80211_smps_mode smps_mode_old,
 				   enum ieee80211_smps_mode smps_mode_new);
 
-void ___ieee80211_stop_rx_ba_session(struct t_sta_info *sta, u16 tid,
+void ___ieee80211_stop_rx_ba_session(struct sta_info *sta, u16 tid,
 				     u16 initiator, u16 reason, bool stop);
-void __ieee80211_stop_rx_ba_session(struct t_sta_info *sta, u16 tid,
+void __ieee80211_stop_rx_ba_session(struct sta_info *sta, u16 tid,
 				    u16 initiator, u16 reason, bool stop);
-void ___ieee80211_start_rx_ba_session(struct t_sta_info *sta,
+void ___ieee80211_start_rx_ba_session(struct sta_info *sta,
 				      u8 dialog_token, u16 timeout,
 				      u16 start_seq_num, u16 ba_policy, u16 tid,
 				      u16 buf_size, bool tx, bool auto_seq,
 				      const struct ieee80211_addba_ext_ie *addbaext);
-void ieee80211_sta_tear_down_BA_sessions(struct t_sta_info *sta,
+void ieee80211_sta_tear_down_BA_sessions(struct sta_info *sta,
 					 enum ieee80211_agg_stop_reason reason);
 void ieee80211_process_delba(struct ieee80211_sub_if_data *sdata,
-			     struct t_sta_info *sta,
+			     struct sta_info *sta,
 			     struct ieee80211_mgmt *mgmt, size_t len);
 void ieee80211_process_addba_resp(struct ieee80211_local *local,
-				  struct t_sta_info *sta,
+				  struct sta_info *sta,
 				  struct ieee80211_mgmt *mgmt,
 				  size_t len);
 void ieee80211_process_addba_request(struct ieee80211_local *local,
-				     struct t_sta_info *sta,
+				     struct sta_info *sta,
 				     struct ieee80211_mgmt *mgmt,
 				     size_t len);
 
-int __ieee80211_stop_tx_ba_session(struct t_sta_info *sta, u16 tid,
+int __ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 				   enum ieee80211_agg_stop_reason reason);
-int ___ieee80211_stop_tx_ba_session(struct t_sta_info *sta, u16 tid,
+int ___ieee80211_stop_tx_ba_session(struct sta_info *sta, u16 tid,
 				    enum ieee80211_agg_stop_reason reason);
-void ieee80211_start_tx_ba_cb(struct t_sta_info *sta, int tid,
+void ieee80211_start_tx_ba_cb(struct sta_info *sta, int tid,
 			      struct tid_ampdu_tx *tid_tx);
-void ieee80211_stop_tx_ba_cb(struct t_sta_info *sta, int tid,
+void ieee80211_stop_tx_ba_cb(struct sta_info *sta, int tid,
 			     struct tid_ampdu_tx *tid_tx);
 void ieee80211_ba_session_work(struct work_struct *work);
-void ieee80211_tx_ba_session_handle_start(struct t_sta_info *sta, int tid);
-void ieee80211_release_reorder_timeout(struct t_sta_info *sta, int tid);
+void ieee80211_tx_ba_session_handle_start(struct sta_info *sta, int tid);
+void ieee80211_release_reorder_timeout(struct sta_info *sta, int tid);
 
 u8 ieee80211_mcs_to_chains(const struct ieee80211_mcs_info *mcs);
 enum nl80211_smps_mode
@@ -2045,27 +2045,27 @@ void
 ieee80211_vht_cap_ie_to_sta_vht_cap(struct ieee80211_sub_if_data *sdata,
 				    struct ieee80211_supported_band *sband,
 				    const struct ieee80211_vht_cap *vht_cap_ie,
-				    struct t_sta_info *sta);
-enum ieee80211_sta_rx_bandwidth ieee80211_sta_cap_rx_bw(struct t_sta_info *sta);
-enum ieee80211_sta_rx_bandwidth ieee80211_sta_cur_vht_bw(struct t_sta_info *sta);
-void ieee80211_sta_set_rx_nss(struct t_sta_info *sta);
+				    struct sta_info *sta);
+enum ieee80211_sta_rx_bandwidth ieee80211_sta_cap_rx_bw(struct sta_info *sta);
+enum ieee80211_sta_rx_bandwidth ieee80211_sta_cur_vht_bw(struct sta_info *sta);
+void ieee80211_sta_set_rx_nss(struct sta_info *sta);
 enum ieee80211_sta_rx_bandwidth
 ieee80211_chan_width_to_rx_bw(enum nl80211_chan_width width);
-enum nl80211_chan_width ieee80211_sta_cap_chan_bw(struct t_sta_info *sta);
+enum nl80211_chan_width ieee80211_sta_cap_chan_bw(struct sta_info *sta);
 void ieee80211_process_mu_groups(struct ieee80211_sub_if_data *sdata,
 				 struct ieee80211_mgmt *mgmt);
 u32 __ieee80211_vht_handle_opmode(struct ieee80211_sub_if_data *sdata,
-                                  struct t_sta_info *sta, u8 opmode,
+                                  struct sta_info *sta, u8 opmode,
 				  enum nl80211_band band);
 void ieee80211_vht_handle_opmode(struct ieee80211_sub_if_data *sdata,
-				 struct t_sta_info *sta, u8 opmode,
+				 struct sta_info *sta, u8 opmode,
 				 enum nl80211_band band);
 void ieee80211_apply_vhtcap_overrides(struct ieee80211_sub_if_data *sdata,
 				      struct ieee80211_sta_vht_cap *vht_cap);
 void ieee80211_get_vht_mask_from_cap(__le16 vht_cap,
 				     u16 vht_mask[NL80211_VHT_NSS_MAX]);
 enum nl80211_chan_width
-ieee80211_sta_rx_bw_to_chan_width(struct t_sta_info *sta);
+ieee80211_sta_rx_bw_to_chan_width(struct sta_info *sta);
 
 /* HE */
 void
@@ -2073,7 +2073,7 @@ ieee80211_he_cap_ie_to_sta_he_cap(struct ieee80211_sub_if_data *sdata,
 				  struct ieee80211_supported_band *sband,
 				  const u8 *he_cap_ie, u8 he_cap_len,
 				  const struct ieee80211_he_6ghz_capa *he_6ghz_capa,
-				  struct t_sta_info *sta);
+				  struct sta_info *sta);
 void
 ieee80211_he_spr_ie_to_bss_conf(struct ieee80211_vif *vif,
 				const struct ieee80211_he_spr *he_spr_ie_elem);
@@ -2083,7 +2083,7 @@ ieee80211_he_op_ie_to_bss_conf(struct ieee80211_vif *vif,
 			const struct ieee80211_he_operation *he_op_ie_elem);
 
 /* S1G */
-void ieee80211_s1g_sta_rate_init(struct t_sta_info *sta);
+void ieee80211_s1g_sta_rate_init(struct sta_info *sta);
 bool ieee80211_s1g_is_twt_setup(struct sk_buff *skb);
 void ieee80211_s1g_rx_twt_action(struct ieee80211_sub_if_data *sdata,
 				 struct sk_buff *skb);
@@ -2148,7 +2148,7 @@ void ieee80211_regulatory_limit_wmm_params(struct ieee80211_sub_if_data *sdata,
 void ieee80211_set_wmm_default(struct ieee80211_sub_if_data *sdata,
 			       bool bss_notify, bool enable_qos);
 void ieee80211_xmit(struct ieee80211_sub_if_data *sdata,
-		    struct t_sta_info *sta, struct sk_buff *skb);
+		    struct sta_info *sta, struct sk_buff *skb);
 
 void __ieee80211_tx_skb_tid_band(struct ieee80211_sub_if_data *sdata,
 				 struct sk_buff *skb, int tid,
@@ -2157,7 +2157,7 @@ void __ieee80211_tx_skb_tid_band(struct ieee80211_sub_if_data *sdata,
 /* sta_out needs to be checked for ERR_PTR() before using */
 int ieee80211_lookup_ra_sta(struct ieee80211_sub_if_data *sdata,
 			    struct sk_buff *skb,
-			    struct t_sta_info **sta_out);
+			    struct sta_info **sta_out);
 
 static inline void
 ieee80211_tx_skb_tid_band(struct ieee80211_sub_if_data *sdata,
@@ -2299,7 +2299,7 @@ int ieee80211_txq_setup_flows(struct ieee80211_local *local);
 void ieee80211_txq_set_params(struct ieee80211_local *local);
 void ieee80211_txq_teardown_flows(struct ieee80211_local *local);
 void ieee80211_txq_init(struct ieee80211_sub_if_data *sdata,
-			struct t_sta_info *sta,
+			struct sta_info *sta,
 			struct txq_info *txq, int tid);
 void ieee80211_txq_purge(struct ieee80211_local *local,
 			 struct txq_info *txqi);
