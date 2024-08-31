@@ -34,4 +34,4 @@ The memory r/w is currently implemented in synchronized block writing/reading (t
 
 2. Run `sudo insmod build/wlsops/wlsops_hack.ko` to install the built kernel modules, where `wlsops_hack` will use the first wireless NIC found in the system;
 
-3. Run the test in `wlsctrl/tests` with root permission.
+3. Run `sudo python3 modify_edca.py`.
